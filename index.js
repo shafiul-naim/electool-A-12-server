@@ -23,6 +23,7 @@ async function run() {
     console.log("database connected");
     const toolsCollection = client.db("electool").collection("tools");
     const orderCollection = client.db("electool").collection("order");
+    const userCollection = client.db("electool").collection("user");
 
     app.get("/tools", async (req, res) => {
       const query = {};
@@ -36,6 +37,22 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const tool = await toolsCollection.findOne(query);
       res.send(tool);
+    });
+
+
+
+    app.put('/user/:email', async(req, res) => {
+        const email = req.params.email;
+        const filter = {email: email};
+        const user = req.body;
+        const options = { upsert: true };
+
+        const updateDoc = {
+            $set: user,
+          };
+          const result = await userCollection.updateOne(filter, updateDoc, options); 
+          const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+          res.send(result)
     });
 
     
