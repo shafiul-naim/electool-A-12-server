@@ -25,6 +25,9 @@ async function run() {
     const toolsCollection = client
       .db("electool")
       .collection("tools");
+    const orderCollection = client
+      .db("electool")
+      .collection("order");
 
 
 
@@ -41,6 +44,12 @@ async function run() {
         const tool = await toolsCollection.findOne(query);
         res.send(tool);
       });
+
+      app.post('/orders', async(req, res) => {
+          const order = req.body;
+          const result = await orderCollection.insertOne(order);
+          res.send(result);
+      })
   } finally {
   }
 }
