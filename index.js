@@ -9,8 +9,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nyhda.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nyhda.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -22,34 +21,38 @@ async function run() {
   try {
     await client.connect();
     console.log("database connected");
-    const toolsCollection = client
-      .db("electool")
-      .collection("tools");
-    const orderCollection = client
-      .db("electool")
-      .collection("order");
-
-
+    const toolsCollection = client.db("electool").collection("tools");
+    const orderCollection = client.db("electool").collection("order");
 
     app.get("/tools", async (req, res) => {
-        const query = {};
-        const cursor = await toolsCollection.find(query);
-        const tools = await cursor.toArray();
-        res.send(tools);
-      });
+      const query = {};
+      const cursor = await toolsCollection.find(query);
+      const tools = await cursor.toArray();
+      res.send(tools);
+    });
 
-      app.get("/tools/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const tool = await toolsCollection.findOne(query);
-        res.send(tool);
-      });
+    app.get("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const tool = await toolsCollection.findOne(query);
+      res.send(tool);
+    });
 
-      app.post('/orders', async(req, res) => {
-          const order = req.body;
-          const result = await orderCollection.insertOne(order);
-          res.send(result);
-      })
+    
+    app.get("/orders", async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      const query = { email: email };
+      const cursor = orderCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    });
   } finally {
   }
 }
