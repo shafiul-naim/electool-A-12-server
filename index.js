@@ -48,6 +48,8 @@ async function run() {
       res.send(tools);
     });
 
+    
+
     app.get("/tools/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -118,6 +120,13 @@ async function run() {
         return res.status(403).send({ message: "forbidden access" });
       }
     });
+
+    app.post("/tools", async (req, res) => {
+        const tool = req.body;
+        console.log('tool', tool)
+        const result = await toolsCollection.insertOne(tool);
+        res.send(result);
+      });
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
