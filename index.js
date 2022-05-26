@@ -23,15 +23,14 @@ function verifyJWT(req, res, next) {
     return res.status(401).send({ message: "UnAuthorized access" });
   }
 
-
-const token = authHeader.split(" ")[1];
-jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-  if (err) {
-    return res.status(403).send({ message: "Forbidden access" });
-  }
-  req.decoded = decoded;
-  next();
-});
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
 }
 
 async function run() {
@@ -56,10 +55,28 @@ async function run() {
       res.send(tool);
     });
 
-    app.get('/user',  async (req, res) => {
-        const users = await userCollection.find().toArray();
-        res.send(users);
+    app.get("/user", verifyJWT, async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
+
+    app.put("/user/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const requester = req.decoded.email;
+      const requesterAccount = await userCollection.findOne({
+        email: requester,
       });
+      if (requesterAccount.role === "admin") {
+        const filter = { email: email };
+        const updateDoc = {
+          $set: { role: "admin" },
+        };
+        const result = await userCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      } else {
+        res.status(403).send({ message: "forbidden" });
+      }
+    });
 
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
