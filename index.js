@@ -41,7 +41,11 @@ async function run() {
     const orderCollection = client.db("electool").collection("order");
     const userCollection = client.db("electool").collection("user");
 
-    app.get("/tools", async (req, res) => {
+
+    
+
+
+    app.get("/tools", verifyJWT, async (req, res) => {
       const query = {};
       const cursor = await toolsCollection.find(query);
       const tools = await cursor.toArray();
@@ -121,7 +125,7 @@ async function run() {
       }
     });
 
-    app.post("/tools", async (req, res) => {
+    app.post("/tools", verifyJWT, async (req, res) => {
         const tool = req.body;
         console.log('tool', tool)
         const result = await toolsCollection.insertOne(tool);
