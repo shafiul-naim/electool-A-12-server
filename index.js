@@ -41,6 +41,7 @@ async function run() {
     const toolsCollection = client.db("electool").collection("tools");
     const orderCollection = client.db("electool").collection("order");
     const userCollection = client.db("electool").collection("user");
+    const paymentCollection = client.db('electool').collection('payments');
 
 
 
@@ -160,6 +161,23 @@ async function run() {
       const orders = await orderCollection.findOne(query);
       res.send(orders);
     });
+
+
+    app.patch('/orders/:id', verifyJWT, async(req, res) =>{
+        const id  = req.params.id;
+        const payment = req.body;
+        const filter = {_id: ObjectId(id)};
+        const updatedDoc = {
+          $set: {
+            paid: true,
+            transactionId: payment.transactionId
+          }
+        }
+  
+        const result = await paymentCollection.insertOne(payment);
+        const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+        res.send(updatedOrder);
+      })
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
