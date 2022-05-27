@@ -41,10 +41,6 @@ async function run() {
     const orderCollection = client.db("electool").collection("order");
     const userCollection = client.db("electool").collection("user");
 
-
-    
-
-
     app.get("/tools", verifyJWT, async (req, res) => {
       const query = {};
       const cursor = await toolsCollection.find(query);
@@ -53,20 +49,18 @@ async function run() {
     });
 
     app.post("/tools", verifyJWT, async (req, res) => {
-        const tool = req.body;
-        console.log('tool', tool)
-        const result = await toolsCollection.insertOne(tool);
-        res.send(result);
-      });
+      const tool = req.body;
+      console.log("tool", tool);
+      const result = await toolsCollection.insertOne(tool);
+      res.send(result);
+    });
 
-      app.delete('/tools/:id', verifyJWT, async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const result = await toolsCollection.deleteOne(query);
-        res.send(result);
-      })
-
-    
+    app.delete("/tools/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     app.get("/tools/:id", async (req, res) => {
       const id = req.params.id;
@@ -80,13 +74,12 @@ async function run() {
       res.send(users);
     });
 
-
-    app.get('/admin/:email', async(req, res) =>{
-        const email = req.params.email;
-        const user = await userCollection.findOne({email: email});
-        const isAdmin = user.role === 'admin';
-        res.send({admin: isAdmin})
-      })
+    app.get("/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await userCollection.findOne({ email: email });
+      const isAdmin = user.role === "admin";
+      res.send({ admin: isAdmin });
+    });
 
     app.put("/user/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
@@ -139,7 +132,12 @@ async function run() {
       }
     });
 
-   
+    app.get("/orders/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const orders = await orderCollection.findOne(query);
+      res.send(orders);
+    });
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
