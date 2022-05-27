@@ -52,6 +52,20 @@ async function run() {
       res.send(tools);
     });
 
+    app.post("/tools", verifyJWT, async (req, res) => {
+        const tool = req.body;
+        console.log('tool', tool)
+        const result = await toolsCollection.insertOne(tool);
+        res.send(result);
+      });
+
+      app.delete('/tools/:id', verifyJWT, async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await toolsCollection.deleteOne(query);
+        res.send(result);
+      })
+
     
 
     app.get("/tools/:id", async (req, res) => {
@@ -125,12 +139,7 @@ async function run() {
       }
     });
 
-    app.post("/tools", verifyJWT, async (req, res) => {
-        const tool = req.body;
-        console.log('tool', tool)
-        const result = await toolsCollection.insertOne(tool);
-        res.send(result);
-      });
+   
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
