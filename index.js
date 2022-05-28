@@ -162,6 +162,13 @@ async function run() {
       res.send(orders);
     });
 
+    app.delete("/orders/:id", verifyJWT, async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await orderCollection.deleteOne(query);
+        res.send(result);
+      });
+
 
     app.patch('/orders/:id', verifyJWT, async(req, res) =>{
         const id  = req.params.id;
