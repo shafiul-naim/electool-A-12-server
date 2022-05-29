@@ -7,6 +7,17 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+
+
+// const corsConfig = {
+//   origin: https://assignment-12-client-d5b00.web.app,
+//   Credential: true,
+// }
+// app.use((req, res, next) => {
+//   res.header({"Access-Control-Allow-Origin": "*"});
+//   next();
+// })
+
 app.use(cors());
 app.use(express.json());
 
@@ -42,6 +53,7 @@ async function run() {
     const orderCollection = client.db("electool").collection("order");
     const userCollection = client.db("electool").collection("user");
     const paymentCollection = client.db("electool").collection("payments");
+    const reviewCollection = client.db("electool").collection("reviews");
     const profileCollection = client.db("electool").collection("profile");
 
     app.post("/create-payment-intent", verifyJWT, async (req, res) => {
@@ -88,6 +100,7 @@ async function run() {
 
     app.get("/user", verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
+      console.log(users)
       res.send(users);
     });
 
@@ -109,22 +122,22 @@ async function run() {
 
 
 
-    app.put("/user/:id", async (req, res) => {
-      const id = req.params.id;
-      const updatedProfile = req.body.updatedProfile;
-      console.log(updatedProfile);
-      const filter = { _id: ObjectId(id) };
-      const options = { upsert: true };
-      const updatedDoc = {
-        $set: updatedProfile,
-      };
-      const result = await userCollection.updateOne(
-        filter,
-        updatedDoc,
-        options
-      );
-      res.send(result);
-    });
+    // app.put("/profile/:email", async (req, res) => {
+    //   const email = req.params.email;
+    //   const updatedProfile = req.body.updatedProfile;
+    //   console.log(updatedProfile);
+    //   const filter = { email: email };
+    //   const options = { upsert: true };
+    //   const updatedDoc = {
+    //     $set: updatedProfile,
+    //   };
+    //   const result = await userCollection.updateOne(
+    //     filter,
+    //     updatedDoc,
+    //     options
+    //   );
+    //   res.send(result);
+    // });
 
 
 
@@ -217,6 +230,31 @@ async function run() {
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
+
+
+
+    app.get("/reviews", async (req, res) => {
+      const review = await reviewCollection.find().toArray();
+      console.log(review)
+      res.send(review);
+    });
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+
+    // app.get("/profile/:email", async (req, res) => {
+    //   const email = req.params.email;
+    //   const query = { email: email };
+    //   console.log("iuwahefruio", email);
+    //   const profile = await profileCollection.findOne(query);
+    //   res.send(profile);
+    // });
+
+
 
  /*    app.get("/profile/:email", async (req, res) => {
       const email = req.params.email;
