@@ -122,22 +122,22 @@ async function run() {
 
 
 
-    // app.put("/profile/:email", async (req, res) => {
-    //   const email = req.params.email;
-    //   const updatedProfile = req.body.updatedProfile;
-    //   console.log(updatedProfile);
-    //   const filter = { email: email };
-    //   const options = { upsert: true };
-    //   const updatedDoc = {
-    //     $set: updatedProfile,
-    //   };
-    //   const result = await userCollection.updateOne(
-    //     filter,
-    //     updatedDoc,
-    //     options
-    //   );
-    //   res.send(result);
-    // });
+    app.put("/profile/:email", async (req, res) => {
+      const email = req.params.email;
+      const updatedProfile = req.body.updatedProfile;
+      console.log(updatedProfile);
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: updatedProfile,
+      };
+      const result = await userCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
 
 
 
@@ -180,6 +180,25 @@ async function run() {
       res.send({ result, token });
     });
 
+
+
+
+
+
+
+    app.get("/allOrders", verifyJWT, async (req, res) => {
+      const query = {};
+      const cursor = await orderCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+
+
+
+
+
+
+
     app.get("/orders", verifyJWT, async (req, res) => {
       const email = req.query.email;
       console.log(email);
@@ -188,7 +207,9 @@ async function run() {
       if (email === decodedEmail) {
         const query = { email: email };
         const cursor = orderCollection.find(query);
+        
         const orders = await cursor.toArray();
+        console.log(orders)
         res.send(orders);
       } else {
         return res.status(403).send({ message: "forbidden access" });
