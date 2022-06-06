@@ -297,7 +297,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("The server is working");
+  res.send("Electool server is working");
 });
 
 app.listen(port, () => {
